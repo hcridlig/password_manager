@@ -5,5 +5,3 @@ python "Script_Password.py"
 pause
 cls
 goto BEGIN
-
-

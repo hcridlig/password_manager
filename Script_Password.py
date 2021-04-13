@@ -20,36 +20,52 @@ def generate():
     return mot_de_passe
 
 
-
-def show_data():
+def connection():
+    global connect, cursor    
     connect = mysql.connector.connect(host="localhost", user="root", password="", database="password_handler")
     cursor= connect.cursor()
 
-    cursor.execute("SELECT site, username, email, password  FROM info")
+    return connect, cursor
+
+
+def show_data():
+    connection()
+
+    cursor.execute("SELECT idi, site, username, email, password  FROM info")
 
     myresult=cursor.fetchall()
 
+    print("\n\n\nId | Site | Username | Email | Mot de passe")
     for x in myresult:
-        print(x)
+        print(x[0],"\t",x[1],"\t",x[2],"\t",x[3],"\t",x[4])
+    print("\n")
+
 
 
 def insert_data(site, username, email, password):
-    connect = mysql.connector.connect(host="localhost", user="root", password="", database="password_handler")
-    cursor= connect.cursor()
+    connection()
 
     sql = "INSERT INTO info (site, username, email, password) VALUES (%s, %s, %s, %s)"
-    val = (site, username,email,password)
+    val = (site, username, email, password)
     cursor.execute(sql, val)
 
     connect.commit()
 
-    print(cursor.rowcount, "record inserted.")    
+    print(cursor.rowcount, "Une ligne ajouté")
 
+
+def delete_data(idi):
+    connection()
+
+    sql = "DELETE FROM info WHERE idi="+idi
+    cursor.execute(sql)
+    connect.commit()
+
+    print(cursor.rowcount, "Une ligne supprimée")
 
 
 #inititalisation
-
-init=input("Voulez-vous: \n 1:Insérer des nouvelles données\n 2:Accéder à vos mot de passe\n")
+init=input("Voulez-vous: \n 1:Insérer des nouvelles données\n 2:Accéder à vos mot de passe\n 3:Effacer des données\n")
 if init=="1":
     pw=input("Voulez-vous générer un mot de passe ? (o/n) : ")
     if pw=="o":
@@ -65,4 +81,9 @@ if init=="1":
         password=input("Mot de passe : ")
         insert_data(site, username, email, password)
 elif init=="2":
+    show_data()
+elif init=="3":
+    show_data()
+    rm=input("Quelle ligne voulez-vous supprimer ? : ")
+    delete_data(rm)
     show_data()

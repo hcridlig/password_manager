@@ -6,6 +6,7 @@ Created on Thu Sep  3 20:22:45 2020
 """
 import random
 import mysql.connector
+from tabulate import tabulate
 
 
 
@@ -34,11 +35,8 @@ def show_data():
     cursor.execute("SELECT idi, site, username, email, password  FROM info")
 
     myresult=cursor.fetchall()
-
-    print("\n\n\nId | Site | Username | Email | Mot de passe")
-    for x in myresult:
-        print(x[0],"\t",x[1],"\t",x[2],"\t",x[3],"\t",x[4])
-    print("\n")
+    headers = ["Id", "Site", "Username", "Email", "Mot de passe"]
+    print(tabulate(myresult, headers, tablefmt="psql"))
 
 
 
@@ -52,6 +50,7 @@ def insert_data(site, username, email, password):
     connect.commit()
 
     print(cursor.rowcount, "Une ligne ajouté")
+    print("\n")
 
 
 def delete_data(idi):
@@ -62,28 +61,40 @@ def delete_data(idi):
     connect.commit()
 
     print(cursor.rowcount, "Une ligne supprimée")
+    print("\n")
 
 
 #inititalisation
-init=input("Voulez-vous: \n 1:Insérer des nouvelles données\n 2:Accéder à vos mot de passe\n 3:Effacer des données\n")
-if init=="1":
-    pw=input("Voulez-vous générer un mot de passe ? (o/n) : ")
-    if pw=="o":
-        site=input("Adresse site web : ")
-        username=input("Nom d'utilisateur : ")
-        email=input("Adresse email : ")
-        password=generate()
-        insert_data(site, username, email, password)
-    elif pw=="n":
-        site=input("Adresse site web : ")
-        username=input("Nom d'utilisateur : ")
-        email=input("Adresse email : ")
-        password=input("Mot de passe : ")
-        insert_data(site, username, email, password)
-elif init=="2":
-    show_data()
-elif init=="3":
-    show_data()
-    rm=input("Quelle ligne voulez-vous supprimer ? : ")
-    delete_data(rm)
-    show_data()
+def menu():
+
+    init=input("Voulez-vous: \n 1:Insérer des nouvelles données\n 2:Accéder à vos mot de passe\n 3:Effacer des données\n 4:Quitter\n")
+    if init=="1":
+        pw=input("Voulez-vous générer un mot de passe ? (o/n) : ")
+        if pw=="o":
+            site=input("Adresse site web : ")
+            username=input("Nom d'utilisateur : ")
+            email=input("Adresse email : ")
+            password=generate()
+            insert_data(site, username, email, password)
+            menu()
+        elif pw=="n":
+            site=input("Adresse site web : ")
+            username=input("Nom d'utilisateur : ")
+            email=input("Adresse email : ")
+            password=input("Mot de passe : ")
+            insert_data(site, username, email, password)
+            menu()
+    elif init=="2":
+        show_data()
+        menu()
+    elif init=="3":
+        show_data()
+        rm=input("Quel id voulez-vous supprimer ? : ")
+        delete_data(rm)
+        show_data()
+        menu()
+    elif init=="4":
+        pass
+
+
+menu()

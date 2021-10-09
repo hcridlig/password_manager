@@ -7,6 +7,7 @@ Created on Thu Sep  3 20:22:45 2020
 import random
 import mysql.connector
 from tabulate import tabulate
+import pyperclip
 
 
 
@@ -26,14 +27,33 @@ def connection():
     return connect, cursor
 
 
-def show_data():
+def request(req):
     connection()
+    global myresult
 
-    cursor.execute("SELECT idi, site, username, email, password  FROM info")
-
+    cursor.execute(req)
     myresult=cursor.fetchall()
+
+    return myresult
+
+
+def show_data():
+    request("SELECT idi, site, username, email, password  FROM info")
+    
     headers = ["Id", "Site", "Username", "Email", "Mot de passe"]
     print(tabulate(myresult, headers, tablefmt="psql"))
+
+    copy_value = input("")
+
+    for x in myresult:
+        if str(x[0]) == str(copy_value):
+            element_copy=request("SELECT password FROM info WHERE idi=" + copy_value)
+            pyperclip.copy(str(element_copy[0][0]))
+            print("1 element copied to clipboard")
+            break
+        
+
+    
 
 
 
